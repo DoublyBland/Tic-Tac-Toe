@@ -1,0 +1,69 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.player-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.player-container div {
+    margin: 25px;
+}
+
+.winner {
+    color: yellowgreen;
+}
+
+.score, .turn {
+    font-size: 24px;
+}
+
+.player {
+    font-size: 32px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.playing {
+    font-weight: bolder;
+    color: red;
+}
+
+#game-board {
+    display: flex;
+    height: 480px;
+    width: 480px;
+    border: 10px;
+    border-color: black;
+    border-style: solid;
+}
+
+#game-board div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+}
+
+#game-board div div {
+    flex: 1;
+    text-align: center;
+    border: solid black 1px;
+    font-size: 8vw;
+   /* border-color: black;
+    border-style: solid;
+    border-collapse: collapse;*/
+}
