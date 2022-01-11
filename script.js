@@ -1,6 +1,7 @@
 const Player = (name, symbol) => { //player factory
     let turn = 0;
     let score = 0;
+
     function playTurn(){
         highlightPlayer();
         const container = document.getElementById("game-board");
@@ -13,8 +14,11 @@ const Player = (name, symbol) => { //player factory
             }
             else {
                 e.target.textContent = symbol;
+                gameBoard.checkForWin();
+                if(!game.gameOver){
                 turn += 1;
                 game.nextTurn();
+            }
             return turn;
              }
             }, {once: true});
@@ -45,6 +49,7 @@ const gameBoard = (function() { //gameBoard module
 
     function initializeGrid(){
         const container = document.getElementById("game-board");
+        _removeAllChildNodes(container);
         for(let i=1;i<=3;i++){
             let row = document.createElement("DIV"); 
             row.setAttribute('id', `${i}`);
@@ -57,6 +62,12 @@ const gameBoard = (function() { //gameBoard module
                 row.appendChild(column);
             }
             container.appendChild(row);
+        }
+    }
+
+    function _removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
         }
     }
 
@@ -82,6 +93,7 @@ const gameBoard = (function() { //gameBoard module
                 for(let i=0;i<column.length;i++){
                     column[i].classList.add('winner');
                 }
+                game.win();
             }
         }
     }
@@ -90,7 +102,6 @@ const gameBoard = (function() { //gameBoard module
         let firstRow = document.getElementsByClassName("row-1");
         let secondRow = document.getElementsByClassName("row-2");
         let thirdRow = document.getElementsByClassName("row-3");
-        console.log(firstRow);
         let rows = [firstRow, secondRow, thirdRow];
         for(let i = 0; i<rows.length; i++){
             let row = rows[i];
@@ -103,6 +114,7 @@ const gameBoard = (function() { //gameBoard module
                 for(let i=0;i<row.length;i++){
                     row[i].classList.add('winner');
                 }
+                game.win();
             }
         }
     }
@@ -131,12 +143,14 @@ const gameBoard = (function() { //gameBoard module
             for(let i=0;i<diagonalOne.length;i++){
                 diagonalOne[i].classList.add('winner');
             }
+            game.win();
         }
 
         if(_checkArrayForWin(twoText)){
             for(let i=0;i<diagonalTwo.length;i++){
                 diagonalTwo[i].classList.add('winner');
             }
+            game.win();
         }
 
     }
@@ -147,7 +161,6 @@ const gameBoard = (function() { //gameBoard module
         let c = array[2];
         if(a){
         if(a === b && b === c){
-            //console.log(`${a} ${b} ${c}`)
             return true;
         }
         else {
@@ -163,7 +176,10 @@ const game = (function() { //game module
     let turn = 0;
     let firstPlayer = Player(prompt("Please enter first player name", "Player 1"), 'X');
     let secondPlayer = Player(prompt("Please enter second player name", "Player 2") ,'O');
-    
+    const reset = document.getElementById("new-game");
+    reset.addEventListener('click', newGame);
+
+
     let players  = decideOrder();
     function beginGame(){
 
@@ -183,6 +199,42 @@ const game = (function() { //game module
         return Math.floor(Math.random() * max);
       }
 
+    function win(){
+        gameOver = true;
+        _plusScore();
+    }
+
+    function _plusScore(){
+        let winner = document.getElementsByClassName("winner");
+        let winningSymbol = winner[0].textContent;
+        if (winningSymbol == "X"){
+            firstPlayer.score += 1;
+        }
+        else if(winningSymbol == "O"){
+            secondPlayer.score += 1;
+        }
+        else {
+            return;
+        }
+        _updateScores();
+    }
+
+    function _updateScores(){
+        let scoreOne = document.getElementById("score-1");
+        let scoreTwo = document.getElementById("score-2");
+        scoreOne.textContent = `Score: ${firstPlayer.score}`
+        scoreTwo.textContent = `Score: ${secondPlayer.score}`
+        return;
+    }
+
+    function newGame(){
+        gameOver = false;
+        gameBoard.initializeGrid();
+        beginGame();
+        nextTurn();
+    }
+
+
     function decideOrder(){
         let random = getRandomInt(2);
         let players = []
@@ -200,11 +252,13 @@ const game = (function() { //game module
     }
 
     function nextTurn(){
+        if(!gameOver){
         let playerOne = players[0];
         let playerTwo = players[1];
         let oneTurn = playerOne.checkTurn();
         let twoTurn = playerTwo.checkTurn();
         if (turn == oneTurn){
+
             oneTurn = playerOne.playTurn();
             gameBoard.checkForWin();
         }
@@ -217,9 +271,11 @@ const game = (function() { //game module
             nextTurn();
         }
     }
+    }
 
-    return {beginGame, nextTurn};
+    return {beginGame, nextTurn, win, gameOver};
   })();
 
 game.beginGame();
 game.nextTurn();
+
